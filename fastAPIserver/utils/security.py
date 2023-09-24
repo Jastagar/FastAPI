@@ -11,17 +11,21 @@ def hash_password(password:str) -> str:
 def verify_password(password:str,knownPassword:str) -> bool:
     return  bool(bcrypt.checkpw(password.encode('utf-8'),knownPassword.encode('utf-8')))
 
-def signAuthToken(data,expiry):
+def signAuthToken(data,expiry:datetime.datetime):
+    print(int(expiry.timestamp()))
     return jwt.encode({
                 "name":data['name'],
                 "email":data['email'],
                 "number":data['number'],
-                "exp":expiry
+                "exp":int(expiry.timestamp())
             },SECRET_JWT)
 
 def verify_token(token:str):
     decodedToken = jwt.decode(token,SECRET_JWT,"HS256")
     currentTime = int(datetime.datetime.now().timestamp())
+
+    print(currentTime,"=====",decodedToken['exp'])
+
     if(decodedToken['exp']<=currentTime):
         return {
             "error":True,
@@ -42,6 +46,9 @@ def verify_token(token:str):
         "user":{
             "name":findingUser['name'],
             "email":findingUser['email'],
-            "number":findingUser['number']
+            "number":findingUser['number'],
+            "tasks":findingUser['tasks'],
+            "idStr":str(findingUser['_id']),
+            "_id":findingUser['_id']
         }
     }

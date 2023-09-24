@@ -5,6 +5,7 @@ import LoginSignup from "./pages/unprotected/loginSignup/LoginSignup.jsx";
 import Dashboard from "./pages/protected/dashboard/Dashboard.jsx";
 import Profile from "./pages/protected/profile/Profile";
 import useUser from "./contexts/userContext";
+import Navbar from "./components/Navbar/Navbar.jsx";
 
 
 function ProtectedRoutes(){
@@ -32,6 +33,7 @@ export default function App() {
   return (
     <div>
       <Router>
+        <Navbar />
         <Routes>
             {/* SafeRoutes */}
             <Route path="/" element={<Home/>} exact/>

@@ -42,7 +42,7 @@ export default function LoginSignup() {
       alert(res.message)
       return
     }
-    localStorage.setItem("authToken",res.token_type+"--"+res.token)
+    localStorage.setItem("authToken",res.token_type+" "+res.token)
 
     setUser(res.user)
     setAuth(true)

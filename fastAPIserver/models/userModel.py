@@ -5,3 +5,4 @@ class User(BaseModel):
     number: int
     password: str
     email:str
+    tasks: list[str]

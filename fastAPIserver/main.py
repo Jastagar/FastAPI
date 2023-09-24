@@ -1,11 +1,13 @@
 from fastapi import FastAPI, Header, Request
 import json, logging, uvicorn,random
 from pydantic import BaseModel
-from database import UserDB
+from database import UserDB,TaskDB
 from datetime import datetime,timedelta
 from fastapi.middleware.cors import CORSMiddleware
 from models.userModel import User
 from utils.security import hash_password,verify_password,signAuthToken,verify_token
+from bson.objectid import ObjectId
+
 
 app = FastAPI()
 app.add_middleware(
@@ -25,6 +27,12 @@ class LoginPost(BaseModel):
     email:str
     password:str
     remember: bool
+
+class PostTask(BaseModel):
+    title:str
+    deadline: int
+    description:str
+    user: str | None =None
 
 
 @app.get("/")
@@ -66,9 +74,9 @@ async def loginHandle(creds:LoginPost):
 
         if(creds.remember==True):
             print("Remembering")
-            expiry = datetime.now() + timedelta(minutes=30)
-        else:
             expiry = datetime.now() + timedelta(days=9999)
+        else:
+            expiry = datetime.now() + timedelta(days=1)
 
         token = signAuthToken({
             "name":foundUser['name'],
@@ -99,8 +107,10 @@ async def loginHandle(creds:LoginPost):
 @app.get("/api/verify")
 async def verifyAuth(req:Request):
     try:
-        incommingToken = str(req.headers['authorization'])
+        incommingToken = str(req.headers['authorization'].split(" ")[1])
         verification = verify_token(incommingToken)
+        verification['_id'] = None
+        verification['user'] = None
         return verification
     except Exception as err:
         print(err)
@@ -109,5 +119,44 @@ async def verifyAuth(req:Request):
             "message":str(err)
         }
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# ------------------------------TASK Routes--------------------
+
+@app.get("/api/tasks")
+async def getAllTasksOfUser(req:Request):
+    token = req.headers['authorization'].split(" ")[1]
+    user = verify_token(token)['user']
+    usersTasksIdList=[]
+    for x in user['tasks']:
+        task = TaskDB.find_one({"_id":x})
+        task["_id"] = str(x)
+        task["user"] = str(task["user"])
+        usersTasksIdList.append(task)
+    return {
+        "error":False,
+        "data": usersTasksIdList
+    }
+
+@app.post("/api/tasks")
+async def postTask(req:Request,taskData:PostTask):
+    token = req.headers['authorization'].split(" ")[1]
+    user = verify_token(token)['user']
+    
+    InsertedTaskId = TaskDB.insert_one({
+        **taskData.model_dump(),
+        "user":user['_id'],
+        "completed":False
+        }).inserted_id
+    
+    usersTasks = user['tasks']
+    usersTasks.append(InsertedTaskId)
+    UserDB.find_one_and_update({"email":user['email']},{"$set" : {"tasks":usersTasks}})
+    return {
+        "error":False,
+        "message": "Added New Task to the list"
+    }
+
+# @app.update("/api/tasks")
+# async def updateTask(req:Request):
+
+# @app.delete("/api/tasks")
+# async def deleteTask(req:Request):
