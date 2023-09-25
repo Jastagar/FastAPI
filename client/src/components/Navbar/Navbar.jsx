@@ -15,7 +15,7 @@ export default function Navbar() {
         navigate('/login')
     }
     return (
-        <nav className='flex justify-center items-center border-b-2'>
+        <nav className='flex justify-center items-center border-b-2 sticky top-0 bg-white z-20'>
             <div className='p-4 text-xl'>
                 <Link to={'/'}>Home</Link>
             </div>

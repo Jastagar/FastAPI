@@ -4,10 +4,10 @@ from pydantic import BaseModel
 from database import UserDB,TaskDB
 from datetime import datetime,timedelta
 from fastapi.middleware.cors import CORSMiddleware
-from models.userModel import User
+from config import get_envs
+# from models.userModel import User
 from utils.security import hash_password,verify_password,signAuthToken,verify_token
 from bson.objectid import ObjectId
-
 
 app = FastAPI()
 app.add_middleware(
@@ -34,6 +34,12 @@ class PostTask(BaseModel):
     description:str
     user: str | None =None
 
+class DeleteTask(BaseModel):
+    id:str
+
+class UpdateTask(PostTask):
+    id:str
+    completed:bool
 
 @app.get("/")
 async def root():
@@ -52,7 +58,10 @@ async def signup(item:SignupCreds):
     copyOfItem.number = int(random.random()*10)
     encryptedPass = hash_password(copyOfItem.password)
     copyOfItem.password = encryptedPass
-    insertedUserId = UserDB.insert_one(copyOfItem.model_dump()).inserted_id
+    insertedUserId = UserDB.insert_one({
+        **copyOfItem.model_dump(),
+        "tasks":[]    
+    }).inserted_id
     return {
         "error":False,
         "user":{
@@ -155,8 +164,36 @@ async def postTask(req:Request,taskData:PostTask):
         "message": "Added New Task to the list"
     }
 
-# @app.update("/api/tasks")
-# async def updateTask(req:Request):
+@app.delete("/api/tasks/{deleteId}")
+async def deleteTask(req:Request,deleteId:str):
+    token = req.headers['authorization'].split(" ")[1]
+    user = verify_token(token)['user']
 
-# @app.delete("/api/tasks")
-# async def deleteTask(req:Request):
+    print("TTD--->",deleteId)
+    TaskDB.find_one_and_delete({"_id":ObjectId(deleteId)})
+    newUserTaskList = user['tasks'].remove(ObjectId(deleteId))
+    if not newUserTaskList:
+        newUserTaskList=[]
+    UserDB.find_one_and_update({"_id":user['_id']},{"$set":{"tasks":newUserTaskList}})
+    return {
+        "error":False,
+        "message":"Task Deleted"
+    }
+
+@app.put("/api/tasks")
+async def updateTask(req:Request,taskData:UpdateTask):
+
+    updatedTask = TaskDB.find_one_and_update({"_id":ObjectId(taskData.id)},{"$set":{
+        "title":taskData.title,
+        "deadline":taskData.deadline,
+        "description":taskData.description,
+        "completed":taskData.completed
+    }})
+    print(updatedTask)
+    return {
+        "error":False,
+        "message":"Task Updated Successfully"
+    }
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)

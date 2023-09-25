@@ -47,7 +47,7 @@ export default function LoginSignup() {
     setUser(res.user)
     setAuth(true)
     console.log("Res",res)
-    navigate('/dashboard')
+    navigate('/')
 
   }
   async function handleSignUpSubmit(e){
@@ -68,7 +68,6 @@ export default function LoginSignup() {
       alert(res.message)
       return
     }
-    setEmail(res.email)
     setJustifyActive('tab1')
 
 
@@ -104,14 +103,14 @@ export default function LoginSignup() {
             <p>Login:</p>
           </div>
           <form onSubmit={handleLoginSubmit}>
-            <MDBInput value={email} onChange={(e)=>{setEmail(e.target.value)}} 
-              wrapperClass='mb-4' label='Email address' type='email'/>
-            <MDBInput value={password} onChange={(e)=>{setPassword(e.target.value)}}
-              wrapperClass='mb-4' label='Password' type='password'/>
-            <MDBCheckbox checked={rememberMe} onChange={(e)=>{setRememberMe(!rememberMe)}}
+            <MDBInput required value={email} onChange={(e)=>{setEmail(e.target.value)}} 
+              wrapperClass='mb-4' placeholder='Email de k btao kon ho' label='Email' type='email'/>
+            <MDBInput required value={password} onChange={(e)=>{setPassword(e.target.value)}}
+              wrapperClass='mb-4' placeholder='Mai kaise maan lu k yehi ho' label='Password' type='password'/>
+            <MDBCheckbox  checked={rememberMe} onChange={(e)=>{setRememberMe(!rememberMe)}}
               wrapperClass='mb-4' label='Remember me' type='checkbox'/>
           
-            <MDBBtn type='submit' className="mb-4 w-100">Sign in</MDBBtn>
+            <button type='submit' className="btn btn-primary mb-4 w-100">Sign in</button>
             <p className="text-center">Not a member? <button type='button' onClick={() => handleJustifyClick('tab2')}>Register</button></p>
           </form>
         </MDBTabsPane>
@@ -133,7 +132,7 @@ export default function LoginSignup() {
               <p className="text-center">Already a member? <button type='button' onClick={() => handleJustifyClick('tab1')}>Login</button></p>
             </div>
 
-            <MDBBtn type='submit' className="mb-4 w-100">Sign up</MDBBtn>
+            <button type='submit' className="btn btn-primary mb-4 w-100">Sign up</button>
           </form>
 
         </MDBTabsPane>

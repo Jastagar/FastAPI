@@ -1,6 +1,9 @@
 from pymongo import MongoClient
+from config import get_envs
 
-myclient = MongoClient("mongodb://localhost:27017/")
+# print(get_envs())
+
+myclient = MongoClient(get_envs().MONGO_URL)
 database = myclient['test']
 UserDB = database["Users"]
 TaskDB = database["Tasks"]

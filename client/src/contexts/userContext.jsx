@@ -13,7 +13,7 @@ export function UserContext(props) {
     const [user,setUser] = useState(null)
 
     useEffect(()=>{
-        if(!auth){
+        if(!auth && localStorage.getItem("authToken")){
             verifyAuth().then(e =>{
                 setAuth(e.authStatus)
             }).catch(alert)

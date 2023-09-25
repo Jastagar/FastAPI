@@ -23,7 +23,7 @@ function UnProtectedRoutes(){
 
   return (
     <>{authStatus
-        ? <Navigate to="/dashboard" />
+        ? <Navigate to="/" />
         : <Outlet/>
      }</>
   )

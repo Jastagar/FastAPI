@@ -33,6 +33,14 @@ async function addTask(data){
     const res = await axios.post(url+ "/tasks",data)
     return res.data
 }
+async function deleteTask(id){
+    const res = await axios.delete(url+ "/tasks/"+id)
+    return res.data
+}
+async function updateTask(data){
+    const res = await axios.put(url+ "/tasks/",data)
+    return res.data
+}
 
 
 export {
@@ -42,4 +50,6 @@ export {
 
     getTasks,
     addTask,
+    deleteTask,
+    updateTask,
 }
