@@ -1,22 +1,22 @@
 version: '3.7'
 
 services:
-    expressserver:
-        build: ./server
-        container_name: expressServer
-        ports:
-            - "3000:3001"
-        command: npm run start
-        volumes:
-            - ./server:/server
-        restart: unless-stopped
+  expressserver:
+    build: ./server
+    container_name: expressServer
+    ports:
+      - "3000:3001"
+    command: sh -c "npm install && npm install -g cross-env && npm run start"
+    volumes:
+      - ./server:/server
+    restart: unless-stopped
 
-    fastapiserver:
-        build: ./fastAPIServer
-        container_name: fastAPIServer
-        ports:
-            - "8000:8000"
-        command: uvicorn main:app --reload
-        volumes:
-            - ./fastAPIServer:/app
-        restart: unless-stopped
+  fastapiserver:
+    build: ./fastAPIServer
+    container_name: fastAPIServer
+    ports:
+      - "8000:8000"
+    command: uvicorn main:app --host 0.0.0.0 --reload
+    volumes:
+      - ./fastAPIServer:/app
+    restart: unless-stopped
