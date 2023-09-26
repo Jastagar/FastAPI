@@ -1,0 +1,7 @@
+fastapi
+pydantic
+pydantic_settings
+uvicorn
+pymongo
+pyjwt
+bcrypt

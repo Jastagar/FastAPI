@@ -1,13 +1,11 @@
 from fastapi import FastAPI, Header, Request
-import json, logging, uvicorn,random
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from database import UserDB,TaskDB
 from datetime import datetime,timedelta
-from fastapi.middleware.cors import CORSMiddleware
-from config import get_envs
-# from models.userModel import User
 from utils.security import hash_password,verify_password,signAuthToken,verify_token
 from bson.objectid import ObjectId
+import json, logging, uvicorn,random
 
 app = FastAPI()
 app.add_middleware(

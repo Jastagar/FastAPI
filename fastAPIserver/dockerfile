@@ -1,0 +1,10 @@
+FROM python:3.10.5-alpine
+
+COPY requirements.txt ./
+
+WORKDIR /app
+
+RUN pip install fastapi uvicorn pydantic pydantic_settings pymongo pyjwt bcrypt
+
+COPY . .
+
